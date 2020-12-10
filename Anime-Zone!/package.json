@@ -1,0 +1,15 @@
+{
+  "name": "anime-zone",
+  "version": "1.0.0",
+  "description": "A small Discord bot written using discord.js to query Anilist's APIv2 for shows. If a show is selected, then it will download it for later viewing on a Plex server.",
+  "main": "bot.js",
+  "dependencies": {
+    "discord.js": "^12.5.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ."
+  },
+  "author": "gplafreniere",
+  "license": "ISC"
+}
