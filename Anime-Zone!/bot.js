@@ -2,6 +2,7 @@ const fs = require('fs');
 const Discord = require('discord.js');
 const { PREFIX, TOKEN } = require('./config.json');
 
+//spawn a bot and generate valid commands for it
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
@@ -18,6 +19,7 @@ client.once('ready', () => {
 	console.log('Ready!');
 });
 
+//event handler for messages with PREFIX at the start
 client.on('message', message => {
 	if (!message.content.startsWith(PREFIX) || message.author.bot) return;
 
@@ -33,10 +35,12 @@ client.on('message', message => {
 		cooldowns.set(command.name, new Discord.Collection());
 	}
 
+	//cooldown of 3 seconds per command usage
 	const now = Date.now();
 	const timestamps = cooldowns.get(command.name);
 	const cooldownAmount = (command.cooldown || 3) * 1000;
 
+	//rate-limit to prevent bad actors from spamming commands
 	if (timestamps.has(message.author.id)) {
 		const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
 

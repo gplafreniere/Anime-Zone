@@ -1,4 +1,5 @@
 {
 	"PREFIX" : "!",
-	"TOKEN": "<bot token goes here>"
+	"TOKEN": "<bot token goes here>",
+	"SEARCH_NUMBER" : 5
 }

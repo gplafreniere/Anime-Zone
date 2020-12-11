@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
-const querystring = require('querystring');
 const Discord = require('discord.js');
+const nyaa = require('../helper_modules/nyaa.js');
 
 const trim = (str, max) => ((str.length > max) ? `${str.slice(0, max - 3)}...` : str);
 
@@ -8,13 +8,15 @@ module.exports = {
 	name: 'shows',
 	description: "Query Anilist for a series and confirm/deny the selection",
 	cooldown: 3,
+	aliases: ['show', 'download'],
 	async execute(message, args) {
 		if (!args.length) {
     		return message.channel.send('You need to supply a search term!');
   		}
 
-  		const searchTerm = args.join(' ');
+  		const searchTerm = args.join(' '); //get title from args
 
+  		//generate querystring for Anilist's APIv2
 		var query = `
 		query ($search: String) { # Define which variables will be used in the query
 		  Media (search: $search, type: ANIME) { # Insert our variables into the query arguments 
@@ -62,6 +64,7 @@ module.exports = {
 		}
 
 		function handleData(data) {
+			//format a new Discord embed with relevant info about the show/movie
 			const embed = new Discord.MessageEmbed()
 			 	.setColor('#EFFF00')
 			  	.setTitle(data.data.Media.title.romaji)
@@ -75,16 +78,17 @@ module.exports = {
 				.setTimestamp()
 				.setFooter("Brought to you by Anime-Zone!");
 
+			//send Discord embed and then handle user input by waiting for a reaction response
 			message.channel.send(embed).then(sentEmbed => {
     			sentEmbed.react("✅")
     			sentEmbed.react("❌")
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && (reaction.emoji.name == '✅' || reaction.emoji.name == '❌'),
                             { max: 1, time: 15000 }).then(collected => {
                                     if (collected.first().emoji.name == '✅') {
-                                            message.channel.send('Poggers');
+                                            nyaa.findShow(message, data.data.Media.title.romaji);
                                     }
                                     else
-                                            message.channel.send('Cringe');
+                                            message.channel.send('Declined. Operation cancelled.');
                             }).catch(() => {
                                     message.channel.send('No reaction after 15 seconds, operation canceled.');
                             });
@@ -92,6 +96,7 @@ module.exports = {
 		}
 
 		function handleError(error) {
+			//in case show not found, clean up error nicely with a different embed
 			const embed = new Discord.MessageEmbed()
 			 	.setColor('#EFFF00')
 			  	.setTitle("Show Not Found")
