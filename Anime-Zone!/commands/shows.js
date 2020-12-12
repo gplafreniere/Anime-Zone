@@ -82,7 +82,7 @@ module.exports = {
 			//send Discord embed and then handle user input by waiting for a reaction response
 			message.channel.send(embed).then(sentEmbed => {
     			sentEmbed.react("✅")
-    			sentEmbed.react("❌")
+    			.then(() => sentEmbed.react("❌"));
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && (reaction.emoji.name == '✅' || reaction.emoji.name == '❌'),
                             { max: 1, time: 15000 }).then(collected => {
                                     if (collected.first().emoji.name == '✅') {
