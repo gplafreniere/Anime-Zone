@@ -1,5 +1,7 @@
 {
 	"PREFIX" : "!",
 	"TOKEN": "<bot token goes here>",
-	"SEARCH_NUMBER" : 5
+	"SEARCH_NUMBER": 10,
+	"SEEDER_THRESHOLD": 1,
+	"DEFAULT_QUALITY": "1080p"
 }

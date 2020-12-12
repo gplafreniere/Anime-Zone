@@ -1,22 +1,14 @@
 const {si} = require('nyaapi')
 const Discord = require('discord.js');
-const { SEARCH_NUMBER } = require('../config.json');
+const { SEARCH_NUMBER, SEEDER_THRESHOLD } = require('../config.json');
 
 module.exports = {
-	findShow(message, args) {
-		si.search({
-  			term: args+' 1080p',
-  			n: SEARCH_NUMBER,
-  			filter: 0,
- 			category: '1_2',
-		})
+	async findShow(message, title, quality) {
+		getList()
 		.then(handleData)
   		.catch((err) => console.log(err))
 
   		function handleData(data) {
-			data = data.filter(filterBySeeders)
-			data = data.sort(compareSeeders);
-
 			var embed = new Discord.MessageEmbed()
 			 	.setColor('#EFFF00')
 			  	.setTitle("Torrent List")
@@ -32,9 +24,33 @@ module.exports = {
 			});
 
 			message.channel.send(embed).then(sentEmbed => {
-    			sentEmbed.react("✅")
-    			sentEmbed.react("❌")
+    			// sentEmbed.react("✅")
+    			// sentEmbed.react("❌")
     		});
+		}
+
+		async function getList() {
+			//return the larger set of torrents according to User's preferences
+			var englishList = await si.search({
+  										term: title.english+" "+quality,
+  										n: SEARCH_NUMBER,
+  										filter: 0,
+ 										category: '1_2',
+									})
+			englishList = englishList.filter(filterBySeeders)
+			englishList = englishList.sort(compareSeeders);
+
+			var romajiList = await si.search({
+								term: title.romaji+" "+quality,
+								n: SEARCH_NUMBER,
+								filter: 0,
+								category: '1_2',
+						})
+
+			romajiList = romajiList.filter(filterBySeeders)
+			romajiList = romajiList.sort(compareSeeders);
+
+			return (romajiList > englishList ? romajiList : englishList);
 		}
 
 		function compareSeeders(torrent1, torrent2) {
@@ -42,7 +58,7 @@ module.exports = {
 		}
 
 		function filterBySeeders(torrent) {
-			if (parseInt(torrent.seeders) >= 10) {
+			if (parseInt(torrent.seeders) >= SEEDER_THRESHOLD) {
 				return true
 			} 
 				return false;

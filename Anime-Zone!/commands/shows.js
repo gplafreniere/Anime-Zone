@@ -1,6 +1,7 @@
 const fetch = require('node-fetch');
 const Discord = require('discord.js');
 const nyaa = require('../helper_modules/nyaa.js');
+const { DEFAULT_QUALITY } = require('../config.json');
 
 const trim = (str, max) => ((str.length > max) ? `${str.slice(0, max - 3)}...` : str);
 
@@ -85,7 +86,7 @@ module.exports = {
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && (reaction.emoji.name == '✅' || reaction.emoji.name == '❌'),
                             { max: 1, time: 15000 }).then(collected => {
                                     if (collected.first().emoji.name == '✅') {
-                                            nyaa.findShow(message, data.data.Media.title.romaji);
+                                            nyaa.findShow(message, data.data.Media.title, DEFAULT_QUALITY);
                                     }
                                     else
                                             message.channel.send('Declined. Operation cancelled.');
