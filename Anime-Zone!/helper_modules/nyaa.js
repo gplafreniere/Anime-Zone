@@ -1,6 +1,8 @@
 const {si} = require('nyaapi')
 const Discord = require('discord.js');
 const { SEARCH_NUMBER, SEEDER_THRESHOLD } = require('../config.json');
+const CHOICES = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
+const INDEXARR = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight", "Ninth", "Tenth"];
 
 module.exports = {
 	async findShow(message, title, quality) {
@@ -8,7 +10,7 @@ module.exports = {
 		.then(handleData)
   		.catch((err) => console.log(err))
 
-  		function handleData(data) {
+  		async function handleData(data) {
 			var embed = new Discord.MessageEmbed()
 			 	.setColor('#EFFF00')
 			  	.setTitle("Torrent List")
@@ -24,33 +26,40 @@ module.exports = {
 			});
 
 			message.channel.send(embed).then(sentEmbed => {
-    			// sentEmbed.react("✅")
-    			// sentEmbed.react("❌")
-    		});
+				for (i = 0; i < data.length; i++) {
+					sentEmbed.react(CHOICES[i]);
+				}
+				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && CHOICES.includes(reaction.emoji.name),
+			                { max: 1, time: 15000 }).then(collected => {
+			                	let index = CHOICES.indexOf(collected.first().emoji.name)
+			                	console.log(`${INDEXARR[index]} torrent selected!`);
+			                	//doSomeFunc() figure out how to open torrent client and use magnet link
+			                }).catch(() => {
+			                        message.channel.send('No reaction after 15 seconds, operation canceled.');
+			                });
+			});
 		}
 
 		async function getList() {
-			//return the larger set of torrents according to User's preferences
-			var englishList = await si.search({
-  										term: title.english+" "+quality,
-  										n: SEARCH_NUMBER,
-  										filter: 0,
- 										category: '1_2',
-									})
+			// //return the larger set of torrents according to User's preferences
+			const baseOptions = {
+				n: SEARCH_NUMBER,
+				filter: 0,
+				category: '1_2',
+			};
+
+			const englishOptions = Object.assign({term: `${title.english} ${quality}`}, baseOptions);
+			const romajiOptions = Object.assign({term: `${title.romaji} ${quality}`}, baseOptions);
+
+			let englishList = await si.search(englishOptions)
 			englishList = englishList.filter(filterBySeeders)
 			englishList = englishList.sort(compareSeeders);
 
-			var romajiList = await si.search({
-								term: title.romaji+" "+quality,
-								n: SEARCH_NUMBER,
-								filter: 0,
-								category: '1_2',
-						})
-
+			let romajiList = await si.search(romajiOptions)
 			romajiList = romajiList.filter(filterBySeeders)
 			romajiList = romajiList.sort(compareSeeders);
 
-			return (romajiList > englishList ? romajiList : englishList);
+			return (romajiList.length >= englishList.length ? romajiList : englishList);
 		}
 
 		function compareSeeders(torrent1, torrent2) {
