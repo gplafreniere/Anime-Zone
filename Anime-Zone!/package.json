@@ -1,11 +1,13 @@
 {
   "name": "anime-zone",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A small Discord bot written using discord.js to query Anilist's APIv2 for shows. If a show is selected, then it will download it for later viewing on a Plex server.",
   "main": "bot.js",
   "dependencies": {
+    "@porla-contrib/autoadd": "^0.2.0",
     "discord.js": "^12.5.1",
-    "nyaapi": "^2.3.3"
+    "nyaapi": "^2.3.3",
+    "webtorrent": "^0.112.0"
   },
   "devDependencies": {},
   "scripts": {
