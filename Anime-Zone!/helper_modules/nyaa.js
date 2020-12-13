@@ -1,5 +1,6 @@
 const {si} = require('nyaapi')
 const Discord = require('discord.js');
+const torrentFile = require("./torrent.js");
 const { SEARCH_NUMBER, SEEDER_THRESHOLD } = require('../config.json');
 const CHOICES = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
 const INDEXARR = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight", "Ninth", "Tenth"];
@@ -17,10 +18,11 @@ module.exports = {
 				.setTimestamp()
 				.setFooter("Brought to you by Anime-Zone!");
 
+			let num = 1;
 			data.forEach(torrent => {
 				var name = torrent.name;
 				var id = torrent.id;
-				embed.addFields({ name: "Torrent:", value: `[${name}](https://nyaa.si/view/${id})`},
+				embed.addFields({ name: `Torrent ${num++}:`, value: `[${name}](https://nyaa.si/view/${id})`},
 								{ name: "Seeders:", value: torrent.seeders, inline: true},
 								{ name: "File size:", value: torrent.filesize, inline: true})
 			});
@@ -31,9 +33,8 @@ module.exports = {
 				}
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && CHOICES.includes(reaction.emoji.name),
 			                { max: 1, time: 15000 }).then(collected => {
-			                	let index = CHOICES.indexOf(collected.first().emoji.name)
-			                	console.log(`${INDEXARR[index]} torrent selected!`);
-			                	//doSomeFunc() figure out how to open torrent client and use magnet link
+			                	let chosenTorrent = CHOICES.indexOf(collected.first().emoji.name)
+			                	torrentFile.startDownload(message,title,data[chosenTorrent]);
 			                }).catch(() => {
 			                        message.channel.send('No reaction after 15 seconds, operation canceled.');
 			                });
