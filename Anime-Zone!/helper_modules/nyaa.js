@@ -3,7 +3,6 @@ const Discord = require('discord.js');
 const torrentFile = require("./torrent.js");
 const { SEARCH_NUMBER, SEEDER_THRESHOLD } = require('../config.json');
 const CHOICES = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
-const INDEXARR = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight", "Ninth", "Tenth"];
 
 module.exports = {
 	async findShow(message, title, quality) {
@@ -32,11 +31,13 @@ module.exports = {
 					sentEmbed.react(CHOICES[i]);
 				}
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && CHOICES.includes(reaction.emoji.name),
-			                { max: 1, time: 15000 }).then(collected => {
-			                	let chosenTorrent = CHOICES.indexOf(collected.first().emoji.name)
+			                { max: 1, time: 30000 }).then(collected => {
+			                	let chosenTorrent = CHOICES.indexOf(collected.first().emoji.name);
 			                	torrentFile.startDownload(message,title,data[chosenTorrent]);
+			                	sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
 			                }).catch(() => {
-			                        message.channel.send('No reaction after 15 seconds, operation canceled.');
+			                        message.channel.send('No selection after 30 seconds, operation canceled.');
+			                        sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
 			                });
 			});
 		}
@@ -52,12 +53,12 @@ module.exports = {
 			const englishOptions = Object.assign({term: `${title.english} ${quality}`}, baseOptions);
 			const romajiOptions = Object.assign({term: `${title.romaji} ${quality}`}, baseOptions);
 
-			let englishList = await si.search(englishOptions)
-			englishList = englishList.filter(filterBySeeders)
+			let englishList = await si.search(englishOptions);
+			englishList = englishList.filter(filterBySeeders);
 			englishList = englishList.sort(compareSeeders);
 
-			let romajiList = await si.search(romajiOptions)
-			romajiList = romajiList.filter(filterBySeeders)
+			let romajiList = await si.search(romajiOptions);
+			romajiList = romajiList.filter(filterBySeeders);
 			romajiList = romajiList.sort(compareSeeders);
 
 			return (romajiList.length >= englishList.length ? romajiList : englishList);
@@ -69,7 +70,7 @@ module.exports = {
 
 		function filterBySeeders(torrent) {
 			if (parseInt(torrent.seeders) >= SEEDER_THRESHOLD) {
-				return true
+				return true;
 			} 
 				return false;
 		}
