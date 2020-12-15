@@ -32,7 +32,7 @@ module.exports = {
 				}
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && CHOICES.includes(reaction.emoji.name),
 			                { max: 1, time: 30000 }).then(collected => {
-			                	let chosenTorrent = CHOICES.indexOf(collected.first().emoji.name)
+			                	let chosenTorrent = CHOICES.indexOf(collected.first().emoji.name);
 			                	torrentFile.startDownload(message,title,data[chosenTorrent]);
 			                	sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
 			                }).catch(() => {
@@ -53,12 +53,12 @@ module.exports = {
 			const englishOptions = Object.assign({term: `${title.english} ${quality}`}, baseOptions);
 			const romajiOptions = Object.assign({term: `${title.romaji} ${quality}`}, baseOptions);
 
-			let englishList = await si.search(englishOptions)
-			englishList = englishList.filter(filterBySeeders)
+			let englishList = await si.search(englishOptions);
+			englishList = englishList.filter(filterBySeeders);
 			englishList = englishList.sort(compareSeeders);
 
-			let romajiList = await si.search(romajiOptions)
-			romajiList = romajiList.filter(filterBySeeders)
+			let romajiList = await si.search(romajiOptions);
+			romajiList = romajiList.filter(filterBySeeders);
 			romajiList = romajiList.sort(compareSeeders);
 
 			return (romajiList.length >= englishList.length ? romajiList : englishList);
@@ -70,7 +70,7 @@ module.exports = {
 
 		function filterBySeeders(torrent) {
 			if (parseInt(torrent.seeders) >= SEEDER_THRESHOLD) {
-				return true
+				return true;
 			} 
 				return false;
 		}
