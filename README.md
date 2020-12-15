@@ -1,4 +1,6 @@
 # Anime-Zone!
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/gplafreniere/Anime-Zone/graphs/commit-activity) [![Generic badge](https://img.shields.io/badge/node-v14.15.1-blue.svg)](https://nodejs.org/en/)
+
 A small bot written in [discord.js](https://discord.js.org/#/) powered by [webtorrent](https://github.com/webtorrent/webtorrent). Originally planned to expedite the process of downloading shows from [Nyaa](https://nyaa.si/) for a Plex server.
 
 # Usage
