@@ -87,11 +87,13 @@ module.exports = {
                             { max: 1, time: 15000 }).then(collected => {
                                     if (collected.first().emoji.name == '✅') {
                                             nyaa.findShow(message, data.data.Media.title, DEFAULT_QUALITY);
-                                    }
-                                    else
+                                    } else {
                                             message.channel.send('Declined. Operation cancelled.');
+                                    }
+                                    sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
                             }).catch(() => {
-                                    message.channel.send('No reaction after 15 seconds, operation canceled.');
+                                    message.channel.send('No selection after 15 seconds, operation canceled.');
+                                    sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
                             });
                 });
 		}

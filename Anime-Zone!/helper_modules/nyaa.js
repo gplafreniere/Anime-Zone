@@ -3,7 +3,6 @@ const Discord = require('discord.js');
 const torrentFile = require("./torrent.js");
 const { SEARCH_NUMBER, SEEDER_THRESHOLD } = require('../config.json');
 const CHOICES = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"];
-const INDEXARR = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight", "Ninth", "Tenth"];
 
 module.exports = {
 	async findShow(message, title, quality) {
@@ -32,11 +31,13 @@ module.exports = {
 					sentEmbed.react(CHOICES[i]);
 				}
 				sentEmbed.awaitReactions((reaction, user) => user.id == message.author.id && CHOICES.includes(reaction.emoji.name),
-			                { max: 1, time: 15000 }).then(collected => {
+			                { max: 1, time: 30000 }).then(collected => {
 			                	let chosenTorrent = CHOICES.indexOf(collected.first().emoji.name)
 			                	torrentFile.startDownload(message,title,data[chosenTorrent]);
+			                	sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
 			                }).catch(() => {
-			                        message.channel.send('No reaction after 15 seconds, operation canceled.');
+			                        message.channel.send('No selection after 30 seconds, operation canceled.');
+			                        sentEmbed.reactions.removeAll().catch(error => console.error('Failed to clear reactions: ', error));
 			                });
 			});
 		}
